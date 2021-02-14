@@ -35,9 +35,8 @@ pub async fn start() -> std::io::Result<()> {
     let cfg = Config::from_env().unwrap();
 
     logging::start(cfg.logging);
-    let pool = db::start(cfg.db).unwrap();
-    let store = Store::new(pool);
-    http::start(cfg.http, store).await?;
+    let pool = db::start(cfg.db).await.unwrap();
+    http::start(cfg.http, Store::new(pool)).await?;
 
     Ok(())
 }

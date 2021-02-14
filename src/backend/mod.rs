@@ -1,6 +1,7 @@
 use crate::common::logging::{self, Logger};
-use crate::store::person::Person;
+use crate::store::user::User;
 use crate::store::Store;
+use anyhow::Result;
 
 #[derive(Clone)]
 pub(crate) struct Backend {
@@ -16,11 +17,19 @@ impl Backend {
         }
     }
 
-    pub fn create_person(&self) -> Person {
-        self.store.create_person()
+    pub async fn create_user(&self) -> Result<i32> {
+        self.store.create_user().await
     }
 
-    pub fn read_person(&self) -> Person {
-        self.store.create_person()
+    pub async fn read_user(&self, id: i32) -> Result<User> {
+        self.store.read_user(id).await
+    }
+
+    pub async fn all_users(&self) -> Result<Vec<User>> {
+        self.store.all_users().await
+    }
+
+    pub async fn update_user(&self, user: &User) -> Result<()> {
+        self.store.update_user(user).await
     }
 }

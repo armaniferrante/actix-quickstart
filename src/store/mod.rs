@@ -1,14 +1,14 @@
-use deadpool_postgres::Pool;
+use sqlx::postgres::PgPool;
 
-pub(crate) mod person;
+pub(crate) mod user;
 
 #[derive(Clone)]
 pub(crate) struct Store {
-    pool: Pool,
+    pool: PgPool,
 }
 
 impl Store {
-    pub(crate) fn new(pool: Pool) -> Self {
+    pub(crate) fn new(pool: PgPool) -> Self {
         Self { pool }
     }
 }

@@ -17,8 +17,10 @@ pub(crate) async fn start(cfg: Config, store: Store) -> Result<()> {
         App::new()
             .wrap(Logger::default())
             .data(backend.clone())
-            .service(handlers::read_person)
-            .service(handlers::create_person)
+            .service(handlers::read_user)
+            .service(handlers::create_user)
+            .service(handlers::update_user)
+            .service(handlers::all_users)
     })
     .bind(("127.0.0.1", cfg.port))?
     .run()
