@@ -1,0 +1,10 @@
+logging:
+  level: info
+  format: pretty
+
+http:
+  port: 8080
+
+db:
+  user: armaniferrante
+  dbname: armaniferrante
