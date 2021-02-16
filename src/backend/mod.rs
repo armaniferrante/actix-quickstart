@@ -1,5 +1,5 @@
 use crate::common::logging::{self, Logger};
-use crate::store::user::User;
+use crate::store::user::{CreateUser, User};
 use crate::store::Store;
 use anyhow::Result;
 
@@ -17,8 +17,8 @@ impl Backend {
         }
     }
 
-    pub async fn create_user(&self) -> Result<i32> {
-        self.store.create_user().await
+    pub async fn create_user(&self, user: &CreateUser) -> Result<User> {
+        self.store.create_user(user).await
     }
 
     pub async fn read_user(&self, id: i32) -> Result<User> {
@@ -29,7 +29,7 @@ impl Backend {
         self.store.all_users().await
     }
 
-    pub async fn update_user(&self, user: &User) -> Result<()> {
+    pub async fn update_user(&self, user: &User) -> Result<User> {
         self.store.update_user(user).await
     }
 }

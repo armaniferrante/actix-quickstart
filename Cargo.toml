@@ -9,6 +9,7 @@ trace = ["slog/max_level_trace", "slog/release_max_level_warn"]
 
 [dependencies]
 actix-web = "3"
+actix-files = "0.5.0"
 anyhow = "1.0.38"
 clap = "3.0.0-beta.2"
 config = { version = "0.10.1", features = ["yaml"] }
@@ -26,3 +27,4 @@ sqlx = { version = "0.4.1", features = ["postgres", "runtime-actix-native-tls", 
 # Needed due to breaking change. See https://github.com/myrrlyn/funty/issues/3.
 funty = "=1.1.0"
 chrono = { version = "0.4", features = ["serde"] }
+validator = { version = "0.12", features = ["derive"] }

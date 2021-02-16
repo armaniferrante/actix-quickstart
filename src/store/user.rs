@@ -3,6 +3,7 @@ use anyhow::Result;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use validator::Validate;
 
 #[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct User {
@@ -14,21 +15,29 @@ pub struct User {
     pub last_name: String,
 }
 
+#[derive(Deserialize, Validate)]
+pub struct CreateUser {
+    #[validate(email)]
+    pub email: String,
+    pub first_name: String,
+    pub last_name: String,
+}
+
 impl Store {
-    pub async fn create_user(&self) -> Result<i32> {
-        let rec = sqlx::query!(
+    pub async fn create_user(&self, user: &CreateUser) -> Result<User> {
+        sqlx::query_as::<_, User>(
             r#"
 INSERT INTO users ( first_name, last_name, email )
 VALUES ( $1, $2, $3 )
 RETURNING id
         "#,
-            "armani",
-            "ferrante",
-            "armaniferrante@blah.com",
         )
+        .bind(&user.first_name)
+        .bind(&user.last_name)
+        .bind(&user.email)
         .fetch_one(&self.pool)
-        .await?;
-        Ok(rec.id)
+        .await
+        .map_err(Into::into)
     }
 
     pub async fn read_user(&self, id: i32) -> Result<User> {
@@ -45,20 +54,20 @@ RETURNING id
             .map_err(Into::into)
     }
 
-    pub async fn update_user(&self, user: &User) -> Result<()> {
-        let rec = sqlx::query!(
+    pub async fn update_user(&self, user: &User) -> Result<User> {
+        sqlx::query_as::<_, User>(
             r#"
 UPDATE users
 SET email=$1, first_name=$2, last_name=$3
 WHERE users.id=$4
 "#,
-            user.email,
-            user.first_name,
-            user.last_name,
-            user.id,
         )
+        .bind(&user.email)
+        .bind(&user.first_name)
+        .bind(&user.last_name)
+        .bind(&user.id)
         .fetch_one(&self.pool)
-        .await?;
-        Ok(())
+        .await
+        .map_err(Into::into)
     }
 }
