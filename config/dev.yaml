@@ -11,3 +11,6 @@ db:
   database: armaniferrante
   user: armaniferrante
   password: password
+
+auth:
+  secret: dummy

@@ -1,5 +1,6 @@
 use sqlx::postgres::PgPool;
 
+pub(crate) mod auth;
 pub(crate) mod user;
 
 #[derive(Clone)]

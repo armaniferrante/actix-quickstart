@@ -1,4 +1,4 @@
-use crate::common::{db, logging};
+use crate::common::{auth, db, logging};
 use crate::store::Store;
 use clap::Clap;
 use config::{Config as ConfigParser, ConfigError, Environment, File};
@@ -19,6 +19,7 @@ struct Config {
     http: http::Config,
     logging: logging::Config,
     db: db::Config,
+    auth: auth::Config,
 }
 
 impl Config {
@@ -35,8 +36,9 @@ pub async fn start() -> std::io::Result<()> {
     let cfg = Config::from_env().unwrap();
 
     logging::start(cfg.logging);
+    let auth = auth::start(cfg.auth);
     let pool = db::start(cfg.db).await.unwrap();
-    http::start(cfg.http, Store::new(pool)).await?;
+    http::start(cfg.http, auth, Store::new(pool)).await?;
 
     Ok(())
 }

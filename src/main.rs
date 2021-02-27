@@ -1,5 +1,6 @@
 pub(crate) mod backend;
 pub(crate) mod common;
+pub(crate) mod error;
 pub(crate) mod gateway;
 pub(crate) mod store;
 
