@@ -1,12 +1,26 @@
 import React from "react";
-import "./App.css";
+import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { store } from './store';
+import "./App.css";
+import Login from './components/Login';
+import Signup from './components/Signup';
 
 function App() {
   return (
-    <div className="App">
-      <Routes />
-    </div>
+		<Provider store={store}>
+			<Router>
+				<Switch>
+					<Layout>
+						<Route exact path="/" component={Default} />
+						<Route exact path="/login" component={LoginPage} />
+						<Route exact path="/signup" component={SignupPage} />
+						<Route exact path="/page1" component={Page1} />
+						<Route exact path="/page2" component={Page2} />
+					</Layout>
+				</Switch>
+			</Router>
+		</Provider>
   );
 }
 
@@ -23,29 +37,22 @@ function Layout(props: any) {
   );
 }
 
-function Routes() {
-  return (
-    <Router>
-      <Switch>
-        <Layout>
-          <Route path="/">
-            <Default />
-          </Route>
-          <Route path="/page1">
-            <Page1 />
-          </Route>
-          <Route path="/page2">
-            <Page2 />
-          </Route>
-        </Layout>
-      </Switch>
-    </Router>
-  );
-}
-
 function Default() {
   return <div>This is the default page yay</div>;
 }
+
+function LoginPage() {
+	return (
+		<Login />
+	);
+}
+
+function SignupPage() {
+	return (
+		<Signup />
+	);
+}
+
 
 function Page1() {
   return <div>This is page 1 yay!</div>;
