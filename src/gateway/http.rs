@@ -1,6 +1,7 @@
 use crate::backend::Backend;
 use crate::common::auth::Auth;
 use crate::gateway::handlers;
+use crate::gateway::middleware::auth::AuthCookies;
 use crate::store::Store;
 use actix_files::Files;
 use actix_web::middleware::Logger;
@@ -18,6 +19,7 @@ pub(crate) async fn start(cfg: Config, auth: Auth, store: Store) -> std::io::Res
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(AuthCookies)
             .data(backend.clone())
             .service(api::health)
             .service(api::create_user)

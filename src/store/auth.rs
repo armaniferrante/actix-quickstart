@@ -28,7 +28,7 @@ pub struct AccessToken {
 
 impl Store {
     pub async fn auth_create_tokens(&self, user_id: i32, auth: &AuthTokens) -> Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.conn.begin().await?;
 
         let refresh = sqlx::query_as::<_, RefreshToken>(
             r#"
@@ -70,7 +70,7 @@ WHERE token=$2
         )
         .bind(&auth.refresh)
         .bind(false)
-        .execute(&self.pool)
+        .execute(&self.conn)
         .await?;
         Ok(())
     }
@@ -81,7 +81,7 @@ WHERE token=$2
         old: &AuthTokens,
         new: &AuthTokens,
     ) -> Result<AuthTokens> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.conn.begin().await?;
 
         sqlx::query(
             r#"
@@ -117,7 +117,7 @@ RETURNING id
         )
         .bind(&new.access)
         .bind(&refresh.id)
-        .fetch_one(&self.pool)
+        .fetch_one(&self.conn)
         .await?;
 
         Ok(AuthTokens {

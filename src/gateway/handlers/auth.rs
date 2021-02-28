@@ -1,7 +1,10 @@
 use crate::backend::Backend;
-use crate::store::user::{CreateUser, User};
-use actix_web::web::{Data, Json, Path};
-use actix_web::{get, post, put, HttpRequest, HttpResponse, Responder};
+use crate::error::Error;
+use crate::gateway::extractors::auth::Auth;
+use crate::gateway::extractors::user_id::UserId;
+use actix_web::cookie::Cookie;
+use actix_web::web::{Data, Json};
+use actix_web::{get, post, HttpResponse};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -11,34 +14,39 @@ pub struct Login {
 }
 
 #[post("/auth/v0/login")]
-pub(crate) async fn login(backend: Data<Backend>, req: Json<Login>) -> impl Responder {
-    let auth_tokens = backend.login(&req.username, &req.password).await.unwrap();
-    // * Set auth header / cookies with access + refresh tokens.
-    HttpResponse::Ok()
+pub(crate) async fn login(backend: Data<Backend>, req: Json<Login>) -> Result<HttpResponse, Error> {
+    let new_tokens = backend.login(&req.username, &req.password).await?;
+    let resp = HttpResponse::Ok()
+        .cookie(Cookie::new("JWT", new_tokens.access.clone()))
+        .cookie(Cookie::new("REFRESH", new_tokens.access.clone()))
+        .finish();
+    Ok(resp)
 }
 
 #[get("/auth/v0/logout")]
-pub(crate) async fn logout(backend: Data<Backend>, req: HttpRequest) -> impl Responder {
-    // TODO:
-    //
-    // * Get refresh token.
-    // * Set valid flag to false for the given refresh token and save to DB.
-    // * Set cookies to empty.
-    //
-    // Done.
-    HttpResponse::Ok()
+pub(crate) async fn logout(
+    backend: Data<Backend>,
+    _user_id: UserId,
+    auth: Auth,
+) -> Result<HttpResponse, Error> {
+    backend.logout(auth.tokens).await?;
+    let resp = HttpResponse::Ok()
+        .cookie(Cookie::new("JWT", ""))
+        .cookie(Cookie::new("REFRESH", ""))
+        .finish();
+    Ok(resp)
 }
 
 #[post("/auth/v0/refresh")]
-pub(crate) async fn refresh(backend: Data<Backend>, req: HttpRequest) -> impl Responder {
-    // TODO:
-    //
-    // * Get reresh token from cookies or auth headers.
-    // * Get refresh token from the database.
-    // * Check refresh token is still valid (not expired, not logged out).
-    // * Create new access token.
-    // * Set cookies to use the new access token.
-    //
-    // Done.
-    HttpResponse::Ok()
+pub(crate) async fn refresh(
+    backend: Data<Backend>,
+    user_id: UserId,
+    auth: Auth,
+) -> Result<HttpResponse, Error> {
+    let new_tokens = backend.refresh(user_id.id, auth.tokens).await?;
+    let resp = HttpResponse::Ok()
+        .cookie(Cookie::new("JWT", new_tokens.access.clone()))
+        .cookie(Cookie::new("REFRESH", new_tokens.access.clone()))
+        .finish();
+    Ok(resp)
 }

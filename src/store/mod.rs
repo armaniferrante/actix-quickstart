@@ -5,11 +5,11 @@ pub(crate) mod user;
 
 #[derive(Clone)]
 pub(crate) struct Store {
-    pool: PgPool,
+    conn: PgPool,
 }
 
 impl Store {
-    pub(crate) fn new(pool: PgPool) -> Self {
-        Self { pool }
+    pub(crate) fn new(conn: PgPool) -> Self {
+        Self { conn }
     }
 }

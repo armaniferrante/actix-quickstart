@@ -1,9 +1,8 @@
-use anyhow::Result;
+use crate::error::Error;
 use jsonwebtoken::{
     decode, encode, Algorithm, DecodingKey, EncodingKey, Header, TokenData, Validation,
 };
 use serde::{Deserialize, Serialize};
-use std::convert::Into;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Deserialize)]
@@ -41,6 +40,20 @@ pub struct Auth {
     decoding_key: DecodingKey<'static>,
 }
 
+impl Default for Auth {
+    fn default() -> Auth {
+        Auth {
+            iss: Default::default(),
+            header: Default::default(),
+            validation: Default::default(),
+            access_token_lifetime: Default::default(),
+            refresh_token_lifetime: Default::default(),
+            encoding_key: EncodingKey::from_secret("default".as_bytes()),
+            decoding_key: DecodingKey::from_secret("default".as_bytes()).into_static(),
+        }
+    }
+}
+
 impl Auth {
     pub fn new(
         iss: String,
@@ -64,12 +77,14 @@ impl Auth {
         }
     }
 
-    pub async fn create_token_pair(&self, id: i32) -> Result<AuthTokens> {
+    pub async fn create_token_pair(&self, id: i32) -> Result<AuthTokens, Error> {
         let time = SystemTime::now();
         let refresh_claims = self.refresh_claims(id.clone(), time);
-        let refresh = encode(&self.header, &refresh_claims, &self.encoding_key)?;
+        let refresh = encode(&self.header, &refresh_claims, &self.encoding_key)
+            .map_err(|_| Error::InvalidJwt)?;
         let access_claims = self.access_claims(id.clone(), time);
-        let access = encode(&self.header, &access_claims, &self.encoding_key)?;
+        let access = encode(&self.header, &access_claims, &self.encoding_key)
+            .map_err(|_| Error::InvalidJwt)?;
         Ok(AuthTokens { refresh, access })
     }
 
@@ -103,8 +118,8 @@ impl Auth {
         }
     }
 
-    pub fn decode(&self, token: &str) -> Result<TokenData<Claims>> {
-        decode::<Claims>(token, &self.decoding_key, &self.validation).map_err(Into::into)
+    pub fn decode(&self, token: &str) -> Result<TokenData<Claims>, Error> {
+        decode::<Claims>(token, &self.decoding_key, &self.validation).map_err(|_| Error::InvalidJwt)
     }
 }
 

@@ -5,8 +5,10 @@ use config::{Config as ConfigParser, ConfigError, Environment, File};
 use serde::Deserialize;
 use std::path::Path;
 
+pub(crate) mod extractors;
 pub(crate) mod handlers;
 pub(crate) mod http;
+pub(crate) mod middleware;
 
 #[derive(Clap)]
 struct Opts {
@@ -37,8 +39,8 @@ pub async fn start() -> std::io::Result<()> {
 
     logging::start(cfg.logging);
     let auth = auth::start(cfg.auth);
-    let pool = db::start(cfg.db).await.unwrap();
-    http::start(cfg.http, auth, Store::new(pool)).await?;
+    let conn = db::start(cfg.db).await.unwrap();
+    http::start(cfg.http, auth, Store::new(conn)).await?;
 
     Ok(())
 }

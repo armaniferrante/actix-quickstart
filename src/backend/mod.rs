@@ -1,10 +1,10 @@
-use crate::common::auth::Auth;
-use crate::common::auth::AuthTokens;
+use crate::common::auth::{unix_timestamp, Auth, AuthTokens};
 use crate::common::logging::{self, Logger};
 use crate::error::Error;
 use crate::store::user::{CreateUser, UpdateUser, User};
 use crate::store::Store;
 use anyhow::Result;
+use std::time::SystemTime;
 
 #[derive(Clone)]
 pub(crate) struct Backend {
@@ -61,10 +61,15 @@ impl Backend {
         self.store.auth_logout(auth).await
     }
 
-    pub async fn refresh(&self, old: AuthTokens) -> Result<AuthTokens> {
-        let user_id = 0; // todo
-
+    pub async fn refresh(&self, user_id: i32, old: AuthTokens) -> Result<AuthTokens> {
+        // Check the token has not yet expired.
+        let token = self.auth.decode(&old.refresh)?;
+        if token.claims.exp < unix_timestamp(SystemTime::now()) {
+            return Err(Error::ExpiredRefreshToken.into());
+        }
+        // Create a new token pair.
         let new = self.auth.create_token_pair(user_id).await?;
+        // Save it to the database.
         self.store.auth_rotate_tokens(user_id, &old, &new).await?;
 
         Ok(new)
