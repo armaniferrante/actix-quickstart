@@ -1,26 +1,26 @@
 import React from "react";
-import { Provider } from 'react-redux';
+import { Provider } from "react-redux";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import { store } from './store';
+import { store } from "./store";
 import "./App.css";
-import Login from './components/Login';
-import Signup from './components/Signup';
+import Login from "./components/Login";
+import Signup from "./components/Signup";
 
 function App() {
   return (
-		<Provider store={store}>
-			<Router>
-				<Switch>
-					<Layout>
-						<Route exact path="/" component={Default} />
-						<Route exact path="/login" component={LoginPage} />
-						<Route exact path="/signup" component={SignupPage} />
-						<Route exact path="/page1" component={Page1} />
-						<Route exact path="/page2" component={Page2} />
-					</Layout>
-				</Switch>
-			</Router>
-		</Provider>
+    <Provider store={store}>
+      <Router>
+        <Switch>
+          <Layout>
+            <Route exact path="/" component={Default} />
+            <Route exact path="/login" component={LoginPage} />
+            <Route exact path="/signup" component={SignupPage} />
+            <Route exact path="/page1" component={Page1} />
+            <Route exact path="/page2" component={Page2} />
+          </Layout>
+        </Switch>
+      </Router>
+    </Provider>
   );
 }
 
@@ -42,17 +42,12 @@ function Default() {
 }
 
 function LoginPage() {
-	return (
-		<Login />
-	);
+  return <Login />;
 }
 
 function SignupPage() {
-	return (
-		<Signup />
-	);
+  return <Signup />;
 }
-
 
 function Page1() {
   return <div>This is page 1 yay!</div>;

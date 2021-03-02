@@ -15,6 +15,8 @@ pub enum Error {
     InvalidJwt,
     #[error("Refresh token expired")]
     ExpiredRefreshToken,
+    #[error("The user doesn't have authorization to perform this action.")]
+    Unauthorized,
     #[error("An unknown error occured")]
     Unknown(#[from] anyhow::Error),
 }
@@ -46,6 +48,7 @@ impl ResponseError for Error {
             Error::InvalidJwt => StatusCode::UNAUTHORIZED,
             Error::InvalidPassword => StatusCode::UNAUTHORIZED,
             Error::ExpiredRefreshToken => StatusCode::UNAUTHORIZED,
+            Error::Unauthorized => StatusCode::UNAUTHORIZED,
             Error::Unknown(_) => StatusCode::INTERNAL_SERVER_ERROR, // todo
         }
     }

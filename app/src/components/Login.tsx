@@ -1,8 +1,3 @@
 export default function Login() {
-
-	return (
-		<div>
-			Login component
-		</div>
-	);
+  return <div>Login component</div>;
 }

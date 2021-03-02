@@ -1,5 +1,5 @@
 [package]
-name = "actix-quickstart"
+name = "gateway"
 version = "0.1.0"
 authors = ["Armani Ferrante <armaniferrante@gmail.com>"]
 edition = "2018"

@@ -1,6 +1,7 @@
 use crate::common::auth::{unix_timestamp, Auth, AuthTokens};
 use crate::common::logging::{self, Logger};
 use crate::error::Error;
+use crate::gateway::http::Config;
 use crate::store::user::{CreateUser, UpdateUser, User};
 use crate::store::Store;
 use anyhow::Result;
@@ -8,6 +9,7 @@ use std::time::SystemTime;
 
 #[derive(Clone)]
 pub(crate) struct Backend {
+    pub cfg: Config,
     auth: Auth,
     store: Store,
     logger: Logger,
@@ -15,10 +17,11 @@ pub(crate) struct Backend {
 
 // Ctor.
 impl Backend {
-    pub fn new(auth: Auth, store: Store) -> Self {
+    pub fn new(cfg: Config, auth: Auth, store: Store) -> Self {
         Self {
             auth,
             store,
+            cfg,
             logger: logging::get_logger("backend"),
         }
     }
@@ -38,7 +41,10 @@ impl Backend {
         self.store.all_users().await
     }
 
-    pub async fn update_user(&self, user: &UpdateUser) -> Result<User> {
+    pub async fn update_user(&self, user_id: i32, user: &UpdateUser) -> Result<User> {
+        if user.id != user_id {
+            return Err(Error::Unauthorized.into());
+        }
         self.store.update_user(user).await
     }
 }

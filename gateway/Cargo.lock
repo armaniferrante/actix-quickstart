@@ -115,38 +115,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-quickstart"
-version = "0.1.0"
-dependencies = [
- "actix-files",
- "actix-http",
- "actix-service",
- "actix-web",
- "actix-web-httpauth",
- "anyhow",
- "chrono",
- "clap",
- "config",
- "funty",
- "futures",
- "jsonwebtoken",
- "lazy_static",
- "rand 0.8.3",
- "rust-argon2",
- "serde 1.0.123",
- "slog 2.7.0",
- "slog-async",
- "slog-json",
- "slog-scope",
- "slog-stdlog",
- "slog-stream",
- "slog-term",
- "sqlx",
- "thiserror",
- "validator",
-]
-
-[[package]]
 name = "actix-router"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1051,6 +1019,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
 dependencies = [
  "byteorder",
+]
+
+[[package]]
+name = "gateway"
+version = "0.1.0"
+dependencies = [
+ "actix-files",
+ "actix-http",
+ "actix-service",
+ "actix-web",
+ "actix-web-httpauth",
+ "anyhow",
+ "chrono",
+ "clap",
+ "config",
+ "funty",
+ "futures",
+ "jsonwebtoken",
+ "lazy_static",
+ "rand 0.8.3",
+ "rust-argon2",
+ "serde 1.0.123",
+ "slog 2.7.0",
+ "slog-async",
+ "slog-json",
+ "slog-scope",
+ "slog-stdlog",
+ "slog-stream",
+ "slog-term",
+ "sqlx",
+ "thiserror",
+ "validator",
 ]
 
 [[package]]

@@ -1,5 +1,6 @@
 use crate::backend::Backend;
 use crate::error::Error;
+use crate::gateway::extractors::user_id::UserId;
 use crate::store::user::{CreateUser, UpdateUser, User};
 use actix_web::web::{Data, Json, Path};
 use actix_web::{get, post, put, HttpResponse};
@@ -31,7 +32,8 @@ pub(crate) async fn read_user(backend: Data<Backend>, id: Path<i32>) -> Result<J
 #[put("/api/v0/user")]
 pub(crate) async fn update_user(
     backend: Data<Backend>,
+    user_id: UserId,
     user: Json<UpdateUser>,
 ) -> Result<Json<User>, Error> {
-    Ok(Json(backend.update_user(&*user).await?))
+    Ok(Json(backend.update_user(user_id.id, &*user).await?))
 }

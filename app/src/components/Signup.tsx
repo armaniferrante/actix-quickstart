@@ -1,8 +1,3 @@
 export default function Signup() {
-
-	return (
-		<div>
-			Sign up component
-		</div>
-	);
+  return <div>Sign up component</div>;
 }

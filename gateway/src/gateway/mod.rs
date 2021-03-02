@@ -18,8 +18,8 @@ struct Opts {
 
 #[derive(Debug, Deserialize)]
 struct Config {
-    http: http::Config,
     logging: logging::Config,
+    http: http::Config,
     db: db::Config,
     auth: auth::Config,
 }

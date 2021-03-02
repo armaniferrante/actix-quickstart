@@ -1,26 +1,25 @@
 export default function reducer(
   state: State = initialState,
-  action: Action,
+  action: Action
 ): State {
-	let newState = {
-		...state,
-	};
-	return newState;
+  let newState = {
+    ...state,
+  };
+  return newState;
 }
 
 export type State = {
-	// todo
-}
+  // todo
+};
 
 const initialState: State = {
-	// todo
+  // todo
 };
 
 export type Action = {
-	type: ActionType;
-	item: any;
-}
+  type: ActionType;
+  item: any;
+};
 
-export enum ActionType {
-	// todo
-}
+export enum ActionType {}
+// todo

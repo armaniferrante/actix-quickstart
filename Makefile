@@ -1,9 +1,12 @@
-DATABASE_URL="postgres://armaniferrante:password@localhost/armaniferrante"
+.PHONY: build test fmt
 
-.PHONY: watch migrate
+build:
+	cd gateway && cargo build --release && cd ../
+	cd app && yarn && yarn build && cd ../
 
-watch:
-	DATABASE_URL=$(DATABASE_URL) cargo watch -x 'run --bin actix-quickstart -- --config config/dev.yaml'
+test:
+	cd gateway && cargo test && cd ../
 
-migrate:
-	DATABASE_URL=$(DATABASE_URL) sqlx migrate run
+fmt:
+	cd gateway && cargo fmt -- --check && cd ../
+	cd app && yarn && yarn lint && cd ../
