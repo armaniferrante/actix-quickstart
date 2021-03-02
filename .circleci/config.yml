@@ -1,0 +1,109 @@
+################################################################################
+#
+# .circleci/config.yml defines the build pipeline for circleci.
+#
+################################################################################
+
+#
+# The default docker image for each job.
+#
+defaults: &defaults
+  docker:
+    - image: armaniferrante/actixdevelopment:latest
+
+version: 2
+jobs:
+  #
+  # Builds all binaries.
+  #
+  build:
+    <<: *defaults
+    steps:
+      - run: echo 'PS1='"'"'\$ '"'"'; . /root/.bashrc' >> $BASH_ENV
+
+      - checkout
+
+      - run: make build
+      - run: make test
+      - run: make fmt
+
+  #
+  # Runs all tests.
+  #
+  test:
+    <<: *defaults
+    steps:
+      - run: echo 'PS1='"'"'\$ '"'"'; . /root/.bashrc' >> $BASH_ENV
+
+      - checkout
+
+      - run: make test
+  #
+  # Ensures all code is properly formatted and linted.
+  #
+  lint:
+    <<: *defaults
+    steps:
+      - run: echo 'PS1='"'"'\$ '"'"'; . /root/.bashrc' >> $BASH_ENV
+
+      - checkout
+
+      - run: make fmt
+  #
+  # Set the docker image's build-tag for later jobs to use.
+  #
+  set-build-tag:
+    << : *defaults
+    steps:
+      - checkout
+
+      - run:
+          name: Set build version.
+          command: .circleci/scripts/build-tag.sh build-tag
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build-tag
+  #
+  # Builds the apps' docker image and publishes it to Dockerhub.
+  #
+  # Requires set-build-tag's /workspace/build-tag to be persisted to the
+  # workspace.
+  #
+  build-and-publish-docker-image:
+    <<: *defaults
+    steps:
+      - run: echo 'PS1='"'"'\$ '"'"'; . /root/.bashrc' >> $BASH_ENV
+
+      - checkout
+
+      - setup_remote_docker
+
+      - attach_workspace:
+          at: /workspace
+
+      - run:
+          name: Export docker build tag
+          command: echo "export BUILD_TAG=$(cat $BUILD_TAG_PATH)" >> $BASH_ENV
+
+      - run:
+          name: Login to docker
+          command: echo "$DOCKERHUB_PASSWORD" |
+                   docker login
+                     --username "$DOCKERHUB_USERNAME"
+                     --password-stdin
+      - run:
+          name: Build deployment images
+          command: make -C docker/ deployments build_tag=$BUILD_TAG workspace=/workspace
+
+      - run:
+          name: Push deployment images
+          command: make -C docker/ push-deployments build_tag=$BUILD_TAG
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - set-build-tag
